@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>University Result Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  :root {
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --surface2: #f7f8fa;
+    --border: #e2e5eb;
+    --accent: #3b5bdb;
+    --accent-hover: #2f4ac4;
+    --accent-light: #eef1fd;
+    --text: #1a1d2e;
+    --muted: #6b7280;
+    --green: #0d9f6f;
+    --green-light: #e6f7f2;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --orange: #d97706;
+    --orange-light: #fffbeb;
+    --purple: #7c3aed;
+    --purple-light: #f3f0ff;
+    --sidebar: #1e2340;
+    --sidebar-hover: #2a3060;
+    --sidebar-active: #3b5bdb;
+    --sidebar-text: #a8b0cc;
+    --sidebar-text-active: #ffffff;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; min-height: 100vh; }
+
+  /* ── Login Page ── */
+  #login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #1e2340 0%, #2d3561 100%);
+  }
+  .login-box {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .login-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .login-logo span { color: var(--accent); }
+  .login-logo svg { color: var(--accent); width: 26px; height: 26px; }
+  .login-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+  .login-box .form-group { margin-bottom: 16px; }
+  .login-box label { display: block; font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+  .input-wrap { position: relative; }
+  .input-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+  .login-box input {
+    background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+    padding: 11px 14px 11px 38px; outline: none; transition: border-color 0.15s; width: 100%;
+  }
+  .login-box input:focus { border-color: var(--accent); background: #fff; }
+  .login-box input::placeholder { color: #b0b7c3; }
+  .login-error { background: var(--red-light); border: 1px solid #fecaca; color: var(--red); border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
+  .login-error svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .login-error.show { display: flex; }
+  .btn-login { width: 100%; padding: 12px; font-size: 15px; margin-top: 4px; }
+
+  /* ── App Layout ── */
+  #app { display: none; }
+  .app-layout { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    background: var(--sidebar);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    padding: 20px 12px;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px 4px;
+    margin-bottom: 2px;
+  }
+  .logo span { color: #7b9cff; }
+  .logo svg { color: #7b9cff; width: 22px; height: 22px; }
+  .sidebar-subtitle {
+    font-size: 10px;
+    color: #4a5280;
+    padding: 0 10px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  nav button {
+    background: none; border: none; color: var(--sidebar-text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    padding: 10px 14px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center;
+    gap: 10px; width: 100%; text-align: left;
+  }
+  nav button:hover { background: var(--sidebar-hover); color: #fff; }
+  nav button.active { background: var(--sidebar-active); color: #fff; }
+  nav button svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
+  nav button.active svg { opacity: 1; }
+
+  .sidebar-bottom { border-top: 1px solid #2d3561; padding-top: 14px; margin-top: 12px; }
+  .user-badge { border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--sidebar-text); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .user-badge svg { width: 14px; height: 14px; }
+
+  /* ── Main ── */
+  .main-content { margin-left: 230px; flex: 1; min-height: 100vh; }
+  main { max-width: 1080px; margin: 0 auto; padding: 32px 28px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .page-title small { display: block; font-size: 13px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+
+  /* ── Cards ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 7px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card-title svg { width: 14px; height: 14px; }
+
+  /* ── Forms ── */
+  .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 13px; color: var(--muted); font-weight: 500; }
+  input, select {
+    background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+    padding: 9px 12px; outline: none; transition: border-color 0.15s; width: 100%;
+  }
+  input:focus, select:focus { border-color: var(--accent); background: #fff; }
+  input::placeholder { color: #b0b7c3; }
+  select { cursor: pointer; }
+
+  /* ── Buttons ── */
+  .btn { border: none; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 9px 18px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn svg { width: 15px; height: 15px; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-danger { background: var(--red-light); color: var(--red); border: 1px solid #fecaca; }
+  .btn-danger:hover { background: #fecaca; }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-green { background: var(--green-light); color: var(--green); border: 1px solid #a7f3d0; }
+  .btn-green:hover { background: #a7f3d0; }
+  .btn-blue { background: var(--accent-light); color: var(--accent); border: 1px solid #c5d0fa; }
+  .btn-blue:hover { background: #c5d0fa; }
+  .btn-red { background: var(--red-light); color: var(--red); border: 1px solid #fecaca; }
+  .btn-red:hover { background: #fecaca; }
+  .btn-sm { padding: 5px 12px; font-size: 13px; }
+  .btn-sm svg { width: 13px; height: 13px; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--surface2); }
+  th { padding: 11px 16px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  td { padding: 13px 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbff; }
+
+  /* ── Badges ── */
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .badge-A { background: var(--green-light); color: var(--green); }
+  .badge-B { background: var(--accent-light); color: var(--accent); }
+  .badge-C { background: var(--orange-light); color: var(--orange); }
+  .badge-D { background: #fff7ed; color: #c2410c; }
+  .badge-F { background: var(--red-light); color: var(--red); }
+
+  /* ── Stat Cards ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; }
+  .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-icon svg { width: 20px; height: 20px; }
+  .stat-card.blue .stat-icon { background: var(--accent-light); color: var(--accent); }
+  .stat-card.green .stat-icon { background: var(--green-light); color: var(--green); }
+  .stat-card.orange .stat-icon { background: var(--orange-light); color: var(--orange); }
+  .stat-card.purple .stat-icon { background: var(--purple-light); color: var(--purple); }
+  .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+
+  /* ── Honours ── */
+  .honours-banner { border-radius: 8px; padding: 12px 18px; margin-bottom: 18px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .honours-banner svg { width: 16px; height: 16px; }
+  .honours-first  { background: #fefce8; border: 1px solid #fde047; color: #854d0e; }
+  .honours-upper  { background: var(--accent-light); border: 1px solid #c5d0fa; color: var(--accent); }
+  .honours-lower  { background: var(--green-light); border: 1px solid #a7f3d0; color: var(--green); }
+  .honours-pass   { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+  .honours-fail   { background: var(--red-light); border: 1px solid #fecaca; color: var(--red); }
+
+  /* ── Report ── */
+  #report-content { display: none; }
+  .report-header { text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 18px; margin-bottom: 22px; }
+  .report-school { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .report-school svg { width: 22px; height: 22px; color: var(--accent); }
+  .report-subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .report-student-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .info-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  .info-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .info-value { font-size: 14px; font-weight: 600; color: var(--text); }
+
+  /* ── Empty state ── */
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+  .empty-state svg { width: 36px; height: 36px; margin-bottom: 12px; opacity: 0.3; }
+  .empty-state p { font-size: 14px; }
+
+  .live-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--green); }
+  .live-dot svg { width: 8px; height: 8px; color: var(--green); }
+
+  /* ── Modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: 100%; max-width: 420px; transform: translateY(16px); transition: transform 0.2s; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .modal-overlay.show .modal { transform: translateY(0); }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--text); }
+  .modal-title svg { width: 18px; height: 18px; color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── Toast ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); border-radius: 10px; padding: 12px 18px; font-size: 14px; color: #fff; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(.2,.8,.4,1); box-shadow: 0 8px 32px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; }
+  .toast svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  @media (max-width: 700px) {
+    .sidebar { width: 60px; padding: 16px 8px; }
+    .sidebar-subtitle, .logo span, nav button span, .user-badge span { display: none; }
+    .logo { justify-content: center; padding: 0; }
+    nav button { justify-content: center; padding: 10px; }
+    .main-content { margin-left: 60px; }
+    .login-box { padding: 28px 20px; }
+  }
+  @media print {
+    .sidebar, .card:not(#report-card), .page:not(#page-reports), .btn { display: none !important; }
+    .main-content { margin-left: 0; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN PAGE ── -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo"><i data-lucide="university"></i> Uni<span>RMS</span></div>
+    <p class="login-subtitle">University Result Management System</p>
+    <div class="login-error" id="login-error">
+      <i data-lucide="alert-circle"></i>
+      <span id="login-error-msg">Invalid username or password</span>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <div class="input-wrap">
+        <i data-lucide="user"></i>
+        <input id="login-username" type="text" placeholder="Enter username" autocomplete="username" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <i data-lucide="lock"></i>
+        <input id="login-password" type="password" placeholder="Enter password" autocomplete="current-password" />
+      </div>
+    </div>
+    <button class="btn btn-primary btn-login" onclick="doLogin()">
+      <i data-lucide="log-in"></i> Sign In
+    </button>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="app">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo"><i data-lucide="university"></i> Uni<span>RMS</span></div>
+      <div class="sidebar-subtitle">Result Management</div>
+      <nav>
+        <button class="active" onclick="showPage('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+        <button onclick="showPage('students')"><i data-lucide="users"></i> Students</button>
+        <button onclick="showPage('marks')"><i data-lucide="clipboard-pen"></i> Enter Marks</button>
+        <button onclick="showPage('grades')"><i data-lucide="pencil-line"></i> Grades</button>
+        <button onclick="showPage('reports')"><i data-lucide="file-text"></i> Reports</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="user-badge"><i data-lucide="shield-check"></i><span id="header-username">admin</span></div>
+        <div id="role-badge" style="border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600;margin-bottom:8px;display:inline-block">Admin</div>
+        <button class="btn btn-red btn-sm" style="width:100%;justify-content:center" onclick="doLogout()"><i data-lucide="log-out"></i> Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <main>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title"><i data-lucide="layout-dashboard"></i><div>Dashboard <small>University results overview</small></div></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card blue"><div class="stat-icon"><i data-lucide="users"></i></div><div class="stat-info"><div class="stat-label">Total Students</div><div class="stat-value" id="stat-students">—</div></div></div>
+        <div class="stat-card green"><div class="stat-icon"><i data-lucide="book-open"></i></div><div class="stat-info"><div class="stat-label">Units / Modules</div><div class="stat-value" id="stat-subjects">—</div></div></div>
+        <div class="stat-card orange"><div class="stat-icon"><i data-lucide="clipboard-check"></i></div><div class="stat-info"><div class="stat-label">Grade Entries</div><div class="stat-value" id="stat-grades">—</div></div></div>
+        <div class="stat-card purple"><div class="stat-icon"><i data-lucide="activity"></i></div><div class="stat-info"><div class="stat-label">System</div><div class="stat-value"><span class="live-dot"><i data-lucide="circle"></i> Live</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i data-lucide="users"></i> Enrolled Students</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Student ID</th><th>Programme</th><th>Year</th><th>Action</th></tr></thead>
+            <tbody id="dash-students-table"><tr><td colspan="5"><div class="empty-state"><i data-lucide="user-x"></i><p>No students yet</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div class="page" id="page-students">
+      <div class="page-header">
+        <div class="page-title"><i data-lucide="users"></i><div>Students <small>Manage enrolled students</small></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i data-lucide="user-plus"></i> Enrol New Student</div>
+        <div class="form-row">
+          <div class="form-group"><label>Full Name</label><input id="s-name" placeholder="e.g. Jane Doe" /></div>
+          <div class="form-group"><label>Student ID</label><input id="s-reg" placeholder="e.g. CS/001/2024" /></div>
+          <div class="form-group"><label>Department</label><input id="s-class" placeholder="e.g. Computer Science" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Programme / Course</label><input id="s-course" placeholder="e.g. BSc Computer Science" /></div>
+          <div class="form-group"><label>Year of Study</label>
+            <select id="s-year">
+              <option value="">Select year...</option>
+              <option value="Year 1">Year 1</option>
+              <option value="Year 2">Year 2</option>
+              <option value="Year 3">Year 3</option>
+              <option value="Year 4">Year 4</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="addStudent()"><i data-lucide="plus"></i> Enrol Student</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><i data-lucide="list"></i> All Students</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Student ID</th><th>Department</th><th>Programme</th><th>Year</th><th>Actions</th></tr></thead>
+            <tbody id="students-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRADES -->
+    <div class="page" id="page-grades">
+      <div class="page-header">
+        <div class="page-title"><i data-lucide="pencil-line"></i><div>Grades <small>Enter &amp; manage unit scores</small></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i data-lucide="plus-circle"></i> Enter Grade</div>
+        <div class="form-row">
+          <div class="form-group"><label>Student</label><select id="g-student"><option value="">Select student...</option></select></div>
+          <div class="form-group"><label>Unit / Module</label><select id="g-subject"><option value="">Select unit...</option></select></div>
+          <div class="form-group"><label>Score (0–100)</label><input id="g-score" type="number" min="0" max="100" placeholder="e.g. 68" /></div>
+          <div class="form-group"><label>Assessment Type</label>
+            <select id="g-exam">
+              <option value="Final Exam">Final Exam</option>
+              <option value="Coursework">Coursework</option>
+              <option value="Practical">Practical</option>
+              <option value="CAT">CAT</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveGrade()"><i data-lucide="save"></i> Save Grade</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><i data-lucide="search"></i> View Grades By Student</div>
+        <div class="form-row" style="margin-bottom:16px">
+          <div class="form-group"><label>Select Student</label><select id="g-view-student" onchange="loadStudentGrades()"><option value="">— choose —</option></select></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Unit / Module</th><th>Score</th><th>Grade</th><th>Remarks</th><th>Assessment</th><th>Actions</th></tr></thead>
+            <tbody id="grades-table"><tr><td colspan="6"><div class="empty-state"><i data-lucide="clipboard"></i><p>Select a student to view grades</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i data-lucide="book-open"></i> Manage Units / Modules</div>
+        <div class="form-row">
+          <div class="form-group"><label>New Unit / Module</label><input id="sub-name" placeholder="e.g. Operating Systems" /></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="addSubject()"><i data-lucide="plus"></i> Add Unit</button>
+        <div id="subjects-list" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="page-header">
+        <div class="page-title"><i data-lucide="file-text"></i><div>Transcripts <small>Generate &amp; print academic transcripts</small></div></div>
+      </div>
+      <div class="card">
+        <div class="form-row" style="align-items:flex-end">
+          <div class="form-group"><label>Select Student</label><select id="r-student"><option value="">— choose student —</option></select></div>
+          <div><button class="btn btn-primary" onclick="generateReport()"><i data-lucide="file-bar-chart"></i> Generate Transcript</button></div>
+        </div>
+      </div>
+      <div id="report-content">
+        <div class="card" id="report-card">
+          <div class="report-header">
+            <div class="report-school"><i data-lucide="university"></i> University Result Management System</div>
+            <div class="report-subtitle">Official Academic Transcript</div>
+          </div>
+          <div id="honours-banner"></div>
+          <div class="report-student-info" id="report-info"></div>
+          <div class="stats-grid" id="report-summary"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Unit / Module</th><th>Score</th><th>Grade</th><th>GPA Points</th><th>Remarks</th><th>Assessment</th></tr></thead>
+              <tbody id="report-grades-table"></tbody>
+            </table>
+          </div>
+          <div style="text-align:right;margin-top:20px">
+            <button class="btn btn-ghost" onclick="window.print()"><i data-lucide="printer"></i> Print Transcript</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTER MARKS -->
+    <div class="page" id="page-marks">
+      <div class="page-header">
+        <div class="page-title"><i data-lucide="clipboard-pen"></i><div>Enter Marks <small>Quick mark entry by unit for a class</small></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i data-lucide="filter"></i> Select Unit & Assessment</div>
+        <div class="form-row">
+          <div class="form-group"><label>Unit / Module</label><select id="m-subject" onchange="loadMarksTable()"><option value="">Select unit...</option></select></div>
+          <div class="form-group"><label>Assessment Type</label>
+            <select id="m-exam" onchange="loadMarksTable()">
+              <option value="Final Exam">Final Exam</option>
+              <option value="Coursework">Coursework</option>
+              <option value="Practical">Practical</option>
+              <option value="CAT">CAT</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="marks-table-card" style="display:none">
+        <div class="card-title"><i data-lucide="table"></i> Student Marks Sheet</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Student Name</th><th>Student ID</th><th>Current Score</th><th>New Score</th></tr></thead>
+            <tbody id="marks-table"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="saveAllMarks()"><i data-lucide="save"></i> Save All Marks</button>
+          <button class="btn btn-ghost" onclick="clearAllInputs()"><i data-lucide="x"></i> Clear</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+    </div><!-- end main-content -->
+  </div><!-- end app-layout -->
+</div><!-- end app -->
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title"><i data-lucide="pencil-line"></i> Edit Grade</div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Unit / Module</label>
+      <input id="edit-subject-name" disabled style="opacity:0.5;cursor:not-allowed" />
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Assessment Type</label>
+      <input id="edit-exam-type" disabled style="opacity:0.5;cursor:not-allowed" />
+    </div>
+    <div class="form-group">
+      <label>New Score (0–100)</label>
+      <input id="edit-score" type="number" min="0" max="100" placeholder="Enter corrected score" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditModal()"><i data-lucide="x"></i> Cancel</button>
+      <button class="btn btn-primary" onclick="submitEdit()"><i data-lucide="save"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-icon"></span><span id="toast-msg"></span></div>
+
+<script>
+const API = '';
+let authToken = sessionStorage.getItem('rms_token') || null;
+let userRole  = sessionStorage.getItem('rms_role')  || null;
+
+function refreshIcons() { lucide.createIcons(); }
+
+// ── Toast ─────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').innerHTML = type === 'success'
+    ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+    : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--red)"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+// ── Auth ──────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!username || !password) { showLoginError('Please enter username and password'); return; }
+  try {
+    const r = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    if (!r.ok) { const e = await r.json(); showLoginError(e.detail || 'Invalid credentials'); return; }
+    const data = await r.json();
+    authToken = data.token;
+    userRole  = data.role;
+    sessionStorage.setItem('rms_token', authToken);
+    sessionStorage.setItem('rms_role',  userRole);
+    document.getElementById('header-username').textContent = data.username;
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('login-error').classList.remove('show');
+    document.getElementById('login-password').value = '';
+    applyRoleRestrictions();
+    refreshIcons();
+    userRole === 'teacher' ? showPage('marks') : loadDashboard();
+  } catch (e) { showLoginError('Connection error. Is the server running?'); }
+}
+
+function showLoginError(msg) {
+  document.getElementById('login-error-msg').textContent = msg;
+  document.getElementById('login-error').classList.add('show');
+  refreshIcons();
+}
+
+async function doLogout() {
+  try { await apiFetch('/auth/logout', { method: 'POST' }); } catch (e) {}
+  authToken = null;
+  userRole  = null;
+  sessionStorage.removeItem('rms_token');
+  sessionStorage.removeItem('rms_role');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+  refreshIcons();
+}
+
+// Check existing session on load
+async function checkSession() {
+  if (!authToken) { refreshIcons(); return; }
+  try {
+    const r = await fetch('/auth/me', { headers: { 'Authorization': `Bearer ${authToken}` } });
+    if (r.ok) {
+      const data = await r.json();
+      userRole = data.role;
+      sessionStorage.setItem('rms_role', userRole);
+      document.getElementById('header-username').textContent = data.username;
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      applyRoleRestrictions();
+      refreshIcons();
+      userRole === 'teacher' ? showPage('marks') : loadDashboard();
+    } else {
+      authToken = null; userRole = null;
+      sessionStorage.removeItem('rms_token');
+      sessionStorage.removeItem('rms_role');
+      refreshIcons();
+    }
+  } catch (e) { refreshIcons(); }
+}
+
+// Enter key on login
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('login-username').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-password').focus();
+});
+
+// ── API helpers ───────────────────────────────────────────
+async function apiFetch(url, opts = {}) {
+  const r = await fetch(API + url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`
+    },
+    ...opts
+  });
+  if (r.status === 401) {
+    authToken = null;
+    sessionStorage.removeItem('rms_token');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-page').style.display = 'flex';
+    showLoginError('Session expired. Please log in again.');
+    refreshIcons();
+    throw new Error('Unauthorized');
+  }
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || 'Request failed'); }
+  return r.json();
+}
+
+function letterBadge(score) {
+  const l = score >= 70 ? 'A' : score >= 60 ? 'B' : score >= 50 ? 'C' : score >= 40 ? 'D' : 'F';
+  return `<span class="badge badge-${l}">${l}</span>`;
+}
+
+function remarksText(score) {
+  if (score >= 70) return 'Distinction';
+  if (score >= 60) return 'Credit';
+  if (score >= 50) return 'Pass';
+  if (score >= 40) return 'Marginal Pass';
+  return 'Fail';
+}
+
+// ── Role Restrictions ─────────────────────────────────────
+function applyRoleRestrictions() {
+  const isTeacher = userRole === 'teacher';
+  const navButtons = document.querySelectorAll('nav button');
+  const pages      = ['dashboard', 'students', 'marks', 'grades', 'reports'];
+  const teacherAllowed = ['marks', 'grades', 'reports'];
+  navButtons.forEach((btn, i) => {
+    btn.style.display = (isTeacher && !teacherAllowed.includes(pages[i])) ? 'none' : 'flex';
+  });
+  const badge = document.getElementById('role-badge');
+  if (badge) {
+    badge.textContent = isTeacher ? 'Teacher' : 'Admin';
+    badge.style.background = isTeacher ? 'var(--green-light)' : 'var(--accent-light)';
+    badge.style.color = isTeacher ? 'var(--green)' : 'var(--accent)';
+  }
+}
+
+function showPage(name) {
+  const teacherAllowed = ['marks', 'grades', 'reports'];
+  if (userRole === 'teacher' && !teacherAllowed.includes(name)) name = 'marks';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach((b, i) => {
+    b.classList.toggle('active', ['dashboard','students','marks','grades','reports'][i] === name);
+  });
+  document.getElementById(`page-${name}`).classList.add('active');
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'students')  loadStudents();
+  if (name === 'marks')     loadMarksPage();
+  if (name === 'grades')    loadGradesPage();
+  if (name === 'reports')   loadReportsPage();
+}
+
+// ── Dashboard ─────────────────────────────────────────────
+async function loadDashboard() {
+  const [students, subjects] = await Promise.all([apiFetch('/students'), apiFetch('/subjects')]);
+  document.getElementById('stat-students').textContent = students.length;
+  document.getElementById('stat-subjects').textContent = subjects.length;
+  let totalGrades = 0;
+  const tbody = document.getElementById('dash-students-table');
+  if (!students.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i data-lucide="user-x"></i><p>No students enrolled yet</p></div></td></tr>`;
+    document.getElementById('stat-grades').textContent = 0;
+    refreshIcons(); return;
+  }
+  let rows = '';
+  for (const s of students.slice(0, 8)) {
+    const grades = await apiFetch(`/grades/${s.id}`);
+    totalGrades += grades.length;
+    rows += `<tr>
+      <td><strong>${s.name}</strong></td>
+      <td style="color:var(--muted)">${s.reg_number}</td>
+      <td>${s.course || s.class}</td>
+      <td style="color:var(--muted)">${s.year_of_study || '—'}</td>
+      <td><button class="btn btn-green btn-sm" onclick="showPage('reports');document.getElementById('r-student').value='${s.id}';generateReport()"><i data-lucide="file-text"></i> Transcript</button></td>
+    </tr>`;
+  }
+  tbody.innerHTML = rows;
+  document.getElementById('stat-grades').textContent = totalGrades;
+  refreshIcons();
+}
+
+// ── Students ──────────────────────────────────────────────
+async function loadStudents() {
+  const students = await apiFetch('/students');
+  const tbody = document.getElementById('students-table');
+  if (!students.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i data-lucide="users"></i><p>No students enrolled yet.</p></div></td></tr>`;
+    refreshIcons(); return;
+  }
+  tbody.innerHTML = students.map((s, i) => `
+    <tr>
+      <td style="color:var(--muted)">${i + 1}</td>
+      <td><strong>${s.name}</strong></td>
+      <td style="color:var(--muted)">${s.reg_number}</td>
+      <td>${s.class}</td>
+      <td style="color:var(--muted)">${s.course || '—'}</td>
+      <td style="color:var(--muted)">${s.year_of_study || '—'}</td>
+      <td style="display:flex;gap:8px">
+        <button class="btn btn-green btn-sm" onclick="goReport(${s.id})"><i data-lucide="file-text"></i> Transcript</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})"><i data-lucide="trash-2"></i> Delete</button>
+      </td>
+    </tr>`).join('');
+  refreshIcons();
+}
+
+function goReport(id) {
+  showPage('reports');
+  setTimeout(() => { document.getElementById('r-student').value = id; generateReport(); }, 100);
+}
+
+async function addStudent() {
+  const name   = document.getElementById('s-name').value.trim();
+  const reg    = document.getElementById('s-reg').value.trim();
+  const cls    = document.getElementById('s-class').value.trim();
+  const course = document.getElementById('s-course').value.trim();
+  const year   = document.getElementById('s-year').value;
+  if (!name || !reg || !cls) return toast('Fill in Name, Student ID and Department', 'error');
+  try {
+    await apiFetch('/students', { method: 'POST', body: JSON.stringify({ name, reg_number: reg, class_name: cls, course, year_of_study: year }) });
+    toast('Student enrolled successfully');
+    ['s-name','s-reg','s-class','s-course'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('s-year').value = '';
+    loadStudents();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteStudent(id) {
+  if (!confirm('Remove this student and all their grades?')) return;
+  await apiFetch(`/students/${id}`, { method: 'DELETE' });
+  toast('Student removed');
+  loadStudents();
+}
+
+// ── Grades ────────────────────────────────────────────────
+async function loadGradesPage() {
+  const [students, subjects] = await Promise.all([apiFetch('/students'), apiFetch('/subjects')]);
+  const populate = (id) => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Select student...</option>' +
+      students.map(s => `<option value="${s.id}">${s.name} (${s.reg_number})</option>`).join('');
+    if (cur) sel.value = cur;
+  };
+  populate('g-student');
+  populate('g-view-student');
+  document.getElementById('g-subject').innerHTML = '<option value="">Select unit...</option>' +
+    subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('subjects-list').innerHTML = subjects.map(s =>
+    `<span style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:13px;color:var(--text)">${s.name}</span>`
+  ).join('');
+  refreshIcons();
+}
+
+async function saveGrade() {
+  const sid   = document.getElementById('g-student').value;
+  const subid = document.getElementById('g-subject').value;
+  const score = parseFloat(document.getElementById('g-score').value);
+  const exam  = document.getElementById('g-exam').value;
+  if (!sid || !subid || isNaN(score)) return toast('Fill in all fields', 'error');
+  if (score < 0 || score > 100) return toast('Score must be 0–100', 'error');
+  try {
+    await apiFetch('/grades', { method: 'POST', body: JSON.stringify({ student_id: +sid, subject_id: +subid, score, exam_type: exam }) });
+    toast('Grade saved');
+    document.getElementById('g-score').value = '';
+    loadStudentGrades();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function loadStudentGrades() {
+  const sid = document.getElementById('g-view-student').value;
+  const tbody = document.getElementById('grades-table');
+  if (!sid) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i data-lucide="clipboard"></i><p>Select a student above</p></div></td></tr>`;
+    refreshIcons(); return;
+  }
+  const grades = await apiFetch(`/grades/${sid}`);
+  if (!grades.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i data-lucide="inbox"></i><p>No grades entered yet</p></div></td></tr>`;
+    refreshIcons(); return;
+  }
+  tbody.innerHTML = grades.map(g => `
+    <tr>
+      <td>${g.subject}</td>
+      <td><strong>${g.score}</strong></td>
+      <td>${letterBadge(g.score)}</td>
+      <td style="color:var(--muted)">${remarksText(g.score)}</td>
+      <td style="color:var(--muted)">${g.exam_type}</td>
+      <td style="display:flex;gap:8px">
+        <button class="btn btn-blue btn-sm" onclick="openEditModal(${g.id}, '${g.subject}', '${g.exam_type}', ${g.score})"><i data-lucide="pencil"></i> Edit</button>
+        ${userRole === 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteGrade(${g.id})"><i data-lucide="trash-2"></i> Remove</button>` : ''}
+      </td>
+    </tr>`).join('');
+  refreshIcons();
+}
+
+async function deleteGrade(id) {
+  await apiFetch(`/grades/${id}`, { method: 'DELETE' });
+  toast('Grade removed');
+  loadStudentGrades();
+}
+
+async function addSubject() {
+  const name = document.getElementById('sub-name').value.trim();
+  if (!name) return toast('Enter unit name', 'error');
+  try {
+    await apiFetch('/subjects', { method: 'POST', body: JSON.stringify({ name }) });
+    toast(`Unit "${name}" added`);
+    document.getElementById('sub-name').value = '';
+    loadGradesPage();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── Edit Modal ────────────────────────────────────────────
+let editGradeId = null;
+
+function openEditModal(id, subject, examType, currentScore) {
+  editGradeId = id;
+  document.getElementById('edit-subject-name').value = subject;
+  document.getElementById('edit-exam-type').value = examType;
+  document.getElementById('edit-score').value = currentScore;
+  document.getElementById('edit-modal').classList.add('show');
+  refreshIcons();
+  setTimeout(() => document.getElementById('edit-score').focus(), 100);
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('show');
+  editGradeId = null;
+}
+
+async function submitEdit() {
+  const score = parseFloat(document.getElementById('edit-score').value);
+  if (isNaN(score) || score < 0 || score > 100) return toast('Score must be 0–100', 'error');
+  try {
+    await apiFetch(`/grades/edit/${editGradeId}`, { method: 'PATCH', body: JSON.stringify({ score }) });
+    toast('Grade updated successfully');
+    closeEditModal();
+    loadStudentGrades();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+
+document.getElementById('edit-score').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitEdit();
+});
+
+// ── Reports ───────────────────────────────────────────────
+async function loadReportsPage() {
+  const students = await apiFetch('/students');
+  document.getElementById('r-student').innerHTML = '<option value="">— choose student —</option>' +
+    students.map(s => `<option value="${s.id}">${s.name} (${s.reg_number})</option>`).join('');
+  refreshIcons();
+}
+
+async function generateReport() {
+  const sid = document.getElementById('r-student').value;
+  if (!sid) return toast('Select a student', 'error');
+  try {
+    const [data, rank] = await Promise.all([apiFetch(`/report/${sid}`), apiFetch(`/rank/${sid}`)]);
+    const s = data.student;
+    const sum = data.summary;
+
+    const honoursMeta = {
+      'First Class Honours': { cls: 'honours-first', icon: 'trophy' },
+      'Second Class Upper':  { cls: 'honours-upper', icon: 'award' },
+      'Second Class Lower':  { cls: 'honours-lower', icon: 'medal' },
+      'Pass':                { cls: 'honours-pass',  icon: 'check-circle' },
+      'Fail':                { cls: 'honours-fail',  icon: 'x-circle' },
+    };
+    const hm = honoursMeta[sum.overall_remarks] || honoursMeta['Pass'];
+    document.getElementById('honours-banner').innerHTML =
+      `<div class="honours-banner ${hm.cls}"><i data-lucide="${hm.icon}"></i> ${sum.overall_remarks}</div>`;
+
+    document.getElementById('report-info').innerHTML = `
+      <div class="info-item"><div class="info-label">Student Name</div><div class="info-value">${s.name}</div></div>
+      <div class="info-item"><div class="info-label">Student ID</div><div class="info-value">${s.reg_number}</div></div>
+      <div class="info-item"><div class="info-label">Department</div><div class="info-value">${s.class}</div></div>
+      <div class="info-item"><div class="info-label">Programme</div><div class="info-value">${s.course || '—'}</div></div>
+      <div class="info-item"><div class="info-label">Year of Study</div><div class="info-value">${s.year_of_study || '—'}</div></div>`;
+
+    document.getElementById('report-summary').innerHTML = `
+      <div class="stat-card blue"><div class="stat-icon"><i data-lucide="percent"></i></div><div class="stat-info"><div class="stat-label">Average Score</div><div class="stat-value">${sum.average}%</div></div></div>
+      <div class="stat-card purple"><div class="stat-icon"><i data-lucide="trending-up"></i></div><div class="stat-info"><div class="stat-label">GPA</div><div class="stat-value">${sum.gpa}</div></div></div>
+      <div class="stat-card green"><div class="stat-icon"><i data-lucide="award"></i></div><div class="stat-info"><div class="stat-label">Grade</div><div class="stat-value">${sum.letter_grade}</div></div></div>
+      <div class="stat-card orange"><div class="stat-icon"><i data-lucide="book-open"></i></div><div class="stat-info"><div class="stat-label">Units Taken</div><div class="stat-value">${sum.subjects_count}</div></div></div>
+      <div class="stat-card blue"><div class="stat-icon"><i data-lucide="trophy"></i></div><div class="stat-info"><div class="stat-label">Class Position</div><div class="stat-value">${rank.position} <span style="font-size:14px;color:var(--muted)">/ ${rank.out_of}</span></div></div></div>`;
+
+    document.getElementById('report-grades-table').innerHTML = !data.grades.length
+      ? `<tr><td colspan="6"><div class="empty-state"><i data-lucide="inbox"></i><p>No grades recorded yet</p></div></td></tr>`
+      : data.grades.map(g => `
+          <tr>
+            <td>${g.subject}</td>
+            <td><strong>${g.score}</strong></td>
+            <td>${letterBadge(g.score)}</td>
+            <td style="color:var(--muted)">${g.gpa_points.toFixed(1)}</td>
+            <td style="color:var(--muted)">${g.remarks}</td>
+            <td style="color:var(--muted)">${g.exam_type}</td>
+          </tr>`).join('');
+
+    document.getElementById('report-content').style.display = 'block';
+    refreshIcons();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── Enter Marks Page ──────────────────────────────────────
+let marksStudents = [];
+
+async function loadMarksPage() {
+  const [students, subjects] = await Promise.all([apiFetch('/students'), apiFetch('/subjects')]);
+  marksStudents = students;
+  document.getElementById('m-subject').innerHTML = '<option value="">Select unit...</option>' +
+    subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('marks-table-card').style.display = 'none';
+  refreshIcons();
+}
+
+async function loadMarksTable() {
+  const subid = document.getElementById('m-subject').value;
+  const exam  = document.getElementById('m-exam').value;
+  if (!subid) { document.getElementById('marks-table-card').style.display = 'none'; return; }
+
+  document.getElementById('marks-table-card').style.display = 'block';
+
+  // Fetch existing grades for all students for this subject+exam
+  const existingMap = {};
+  await Promise.all(marksStudents.map(async s => {
+    const grades = await apiFetch(`/grades/${s.id}`);
+    const match = grades.find(g => g.subject_id == subid && g.exam_type === exam);
+    existingMap[s.id] = match ? match.score : '';
+  }));
+
+  const tbody = document.getElementById('marks-table');
+  if (!marksStudents.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i data-lucide="users"></i><p>No students enrolled</p></div></td></tr>`;
+    refreshIcons(); return;
+  }
+
+  tbody.innerHTML = marksStudents.map((s, i) => `
+    <tr>
+      <td style="color:var(--muted)">${i + 1}</td>
+      <td><strong>${s.name}</strong></td>
+      <td style="color:var(--muted)">${s.reg_number}</td>
+      <td>${existingMap[s.id] !== '' ? `<span class="badge badge-${existingMap[s.id] >= 70 ? 'A' : existingMap[s.id] >= 60 ? 'B' : existingMap[s.id] >= 50 ? 'C' : existingMap[s.id] >= 40 ? 'D' : 'F'}">${existingMap[s.id]}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+      <td><input type="number" min="0" max="100" placeholder="0–100" data-student-id="${s.id}" class="mark-input" style="max-width:100px" /></td>
+    </tr>`).join('');
+  refreshIcons();
+}
+
+async function saveAllMarks() {
+  const subid = document.getElementById('m-subject').value;
+  const exam  = document.getElementById('m-exam').value;
+  if (!subid) return toast('Select a unit first', 'error');
+
+  const inputs = document.querySelectorAll('.mark-input');
+  const toSave = [];
+  let hasError = false;
+
+  inputs.forEach(inp => {
+    const val = inp.value.trim();
+    if (val === '') return; // skip empty
+    const score = parseFloat(val);
+    if (isNaN(score) || score < 0 || score > 100) { hasError = true; return; }
+    toSave.push({ student_id: +inp.dataset.studentId, subject_id: +subid, score, exam_type: exam });
+  });
+
+  if (hasError) return toast('Some scores are invalid (must be 0–100)', 'error');
+  if (!toSave.length) return toast('No marks entered', 'error');
+
+  try {
+    await Promise.all(toSave.map(g =>
+      apiFetch('/grades', { method: 'POST', body: JSON.stringify(g) })
+    ));
+    toast(`${toSave.length} mark${toSave.length > 1 ? 's' : ''} saved successfully`);
+    loadMarksTable(); // reload to show updated current scores
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function clearAllInputs() {
+  document.querySelectorAll('.mark-input').forEach(i => i.value = '');
+}
+
+// ── Init ──────────────────────────────────────────────────
+checkSession();
+</script>
+</body>
+</html>
